@@ -807,7 +807,7 @@ async finalizeTreatment(treatmentId: string, finalData: {
     await this.emailService.sendTreatmentFinal(
       treatment.demande.email,
       treatment.demande.numeroReference,
-      finalData.resultat,
+      "Terminé",
       message
     );
   }
