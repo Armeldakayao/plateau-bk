@@ -208,6 +208,7 @@ export class NotificationsService {
       user_id: createNotificationDto.userId, // CORRECTION: Mapper userId vers user_id
       service_request_id: createNotificationDto.serviceRequestId, // CORRECTION: Mapper serviceRequestId vers service_request_id
       isRead: false, // CORRECTION: Définir explicitement isRead
+     // CORRECTION: Ajouter la relation si nécessaire
     });
     
     return this.notificationRepository.save(notification);

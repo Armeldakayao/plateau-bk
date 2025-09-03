@@ -734,7 +734,7 @@ async updateTreatment(treatmentId: string, updateTreatmentDto: UpdateTreatmentDt
     await this.notificationsService.create({
       userId: treatment.demande.utilisateur_id,
       message: updateTreatmentDto.messageAgent,
-      type: this.getNotificationTypeFromResultat(updateTreatmentDto.resultat),
+      type: this.getNotificationTypeFromResultat(updateTreatmentDto.etat),
       serviceRequestId: treatment.demande.id,
     });
 
@@ -742,7 +742,7 @@ async updateTreatment(treatmentId: string, updateTreatmentDto: UpdateTreatmentDt
       await this.emailService.sendTreatmentUpdate(
         treatment.demande.email,
         treatment.demande.numeroReference,
-        updateTreatmentDto.resultat || 'en_cours',
+        treatment.etat || 'en_cours',
         updateTreatmentDto.messageAgent
       );
     }
@@ -793,7 +793,7 @@ async finalizeTreatment(treatmentId: string, finalData: {
   await this.serviceRequestRepository.save(treatment.demande);
 
   // CORRECTION: Notifications
-  const notificationType = this.getNotificationTypeFromResultat(finalData.resultat);
+  const notificationType = this.getNotificationTypeFromResultat(treatment.etat);
   const message = finalData.messageAgent || `Votre demande ${treatment.demande.numeroReference} a été ${finalData.resultat}`;
 
   await this.notificationsService.create({
@@ -807,7 +807,7 @@ async finalizeTreatment(treatmentId: string, finalData: {
     await this.emailService.sendTreatmentFinal(
       treatment.demande.email,
       treatment.demande.numeroReference,
-      "Terminé",
+      TraitementEtat.TERMINE,
       message
     );
   }
@@ -908,14 +908,14 @@ async finalizeTreatment(treatmentId: string, finalData: {
     }
   }
 
-  private getNotificationTypeFromResultat(resultat: TraitementResultat): string {
+  private getNotificationTypeFromResultat(resultat: TraitementEtat): string {
     switch (resultat) {
-      case TraitementResultat.VALIDEE:
+      case TraitementEtat.TERMINE:
         return 'success';
-      case TraitementResultat.REFUSEE:
+      case TraitementEtat.ANNULE:
         return 'error';
-      case TraitementResultat.INCOMPLETE:
-      case TraitementResultat.REPORTEE:
+      case TraitementEtat.SUSPENDU:
+     
         return 'warning';
       default:
         return 'info';
